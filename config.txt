@@ -1,0 +1,8 @@
+background=background.jpg
+interval=3000
+frame=on
+frame_color=255,255,255
+image1=480,270;900,400;25
+image2=1440,270;900,400;-15
+image3=480,810;900,400;15
+image4=1440,810;900,400;-25
