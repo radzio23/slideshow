@@ -1,8 +1,9 @@
-background=background.jpg
-interval=3000
-frame=on
-frame_color=255,255,255
-image1=480,270;900,400;25
-image2=1440,270;900,400;-15
-image3=480,810;900,400;15
-image4=1440,810;900,400;-25
+background tlo.jpg
+interval 3.0
+frame_type simple
+frame_color 240 240 240
+
+slot 900 500 400 300 - 10
+slot 1700 500 350 250 15
+slot 900 1000 400 300 5
+slot 1700 1000 450 350 - 5
