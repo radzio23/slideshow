@@ -51,11 +51,11 @@ bool PhotoSlot::loadImage(const std::filesystem::path &path, FrameType fType)
     m_photoSprite.setScale({finalScale, finalScale});
     m_photoSprite.setOrigin({(float)texSize.x / 2.0f, (float)texSize.y / 2.0f});
 
-    float yOffset = (fType == FrameType::Polaroid) ? -30.0f : 0.0f;
+    float yOffset = (fType == FrameType::Polaroid) ? 30.0f : 0.0f;
 
     float rad = m_config.rotation * 3.14159f / 180.0f;
     float finalX = m_config.x + yOffset * std::sin(rad);
-    float finalY = m_config.y + yOffset * std::cos(rad);
+    float finalY = m_config.y - yOffset * std::cos(rad);
 
     m_photoSprite.setPosition({finalX, finalY});
     m_photoSprite.setRotation(sf::degrees(m_config.rotation));
@@ -76,11 +76,11 @@ void PhotoSlot::draw(sf::RenderWindow &window, FrameType fType)
     }
     else if (fType == FrameType::CustomFromFile)
     {
-        window.draw(m_photoSprite);
         if (m_customFrameSprite)
         {
             window.draw(*m_customFrameSprite);
         }
+        window.draw(m_photoSprite);
     }
     else
     {

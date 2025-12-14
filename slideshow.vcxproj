@@ -124,7 +124,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="slideshow.cpp" />
+    <ClCompile Include="App.cpp" />
+    <ClCompile Include="Config.cpp" />
+    <ClCompile Include="ImageLoader.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="PhotoSlot.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="App.h" />
+    <ClInclude Include="AppConfig.h" />
+    <ClInclude Include="Config.h" />
+    <ClInclude Include="FrameType.h" />
+    <ClInclude Include="ImageLoader.h" />
+    <ClInclude Include="PhotoSlot.h" />
+    <ClInclude Include="SlotConfig.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

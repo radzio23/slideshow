@@ -48,6 +48,10 @@ Config::Config(const std::string &filename)
                 m_appConfig.frameFilePath = type;
             }
         }
+        else if (key == "frame_file")
+        {
+            ss >> m_appConfig.frameFilePath;
+        }
         else if (key == "frame_color")
         {
             int r, g, b;

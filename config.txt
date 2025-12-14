@@ -1,9 +1,17 @@
+##### Ustawienia ogólne wyglądu
+### Tło
 background tlo.jpg
+### Czas zmiany zdjęcia
 interval 3.0
-frame_type simple
-frame_color 240 240 240
+### Typ ramki (none/simple/polaroid/customfromfile)
+frame_type customfromfile 
+### Własna ramka
+frame_file ramka.jpg
+### Kolor ramki
+frame_color 0 176 176
 
-slot 900 500 400 300 - 10
-slot 1700 500 350 250 15
-slot 900 1000 400 300 5
-slot 1700 1000 450 350 - 5
+##### Definicje slotów na zdjęcia (slot [x] [y] [szerokość] [wysokość] [obrót])
+slot 500 250 400 300 -10
+slot 1200 250 350 250 0
+slot 500 750 400 300 10
+slot 1200 750 450 350 30
