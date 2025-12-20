@@ -27,6 +27,13 @@ public:
     // Rysuje zawartość slotu (zdjęcie i ramkę) w podanym oknie.
     void draw(sf::RenderWindow &window, FrameType fType);
 
+    // GETTERY
+    sf::Texture& getTexture() { return m_photoTexture; }
+    const sf::Texture& getTexture() const { return m_photoTexture; }
+
+    sf::Sprite& getSprite() { return m_photoSprite; }
+    const sf::Sprite& getSprite() const { return m_photoSprite; }
+
 private:
     sf::Texture m_photoTexture;
     sf::Sprite m_photoSprite;
