@@ -226,8 +226,8 @@ void App::setupSlots() {
             SlotConfig cfg;
 
             // losowa pozycja 
-            cfg.x = std::rand() % m_window.getSize().x;
-            cfg.y = std::rand() % m_window.getSize().y; 
+            cfg.x = std::rand() % (m_window.getSize().x - static_cast<unsigned>(cfg.width));
+            cfg.y = std::rand() % (m_window.getSize().y - static_cast<unsigned>(cfg.height));
            
             // losowy obrót 
             cfg.rotation = std::rand() % 360;
