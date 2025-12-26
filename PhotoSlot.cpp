@@ -87,3 +87,17 @@ void PhotoSlot::draw(sf::RenderWindow &window, FrameType fType)
         window.draw(m_photoSprite);
     }
 }
+
+void PhotoSlot::setFrameAlpha(uint8_t a)
+{
+    if (m_customFrameSprite.has_value()) {
+        sf::Color c = m_customFrameSprite.value().getColor();
+        c.a = a;
+        m_customFrameSprite.value().setColor(c);
+    }
+    else {
+        sf::Color c = m_shapeFrame.getFillColor();
+        c.a = a;
+        m_shapeFrame.setFillColor(c);
+    }
+}
