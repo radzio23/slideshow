@@ -39,7 +39,7 @@ private:
     // Zanikanie zdjęcia
     bool m_isTransition = false;
     float m_transitionTime = 0.0f;
-    float m_transitionDuration = 3.0f; // 1 sekunda = 0.5 fade out + 0.5 fade in
+    float m_transitionDuration = 2.0f; // 1 sekunda = 0.5 fade out + 0.5 fade in
     int m_fadingSlotIndex = -1;
 
     sf::Texture m_oldTexture;
