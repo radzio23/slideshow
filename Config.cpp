@@ -58,8 +58,15 @@ Config::Config(const std::string &filename)
             ss >> r >> g >> b;
             m_appConfig.frameColor = sf::Color(r, g, b);
         }
+        else if (key == "random_mode")
+        {
+            std::string value;
+            ss >> value;
+            m_appConfig.randomMode = (value == "true");
+        }
         else if (key == "slot")
         {
+            if (m_appConfig.randomMode) return;
             SlotConfig sc;
             ss >> sc.x >> sc.y >> sc.width >> sc.height >> sc.rotation;
             m_appConfig.slots.push_back(sc);

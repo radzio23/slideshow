@@ -14,5 +14,6 @@ struct AppConfig
     std::string frameFilePath;
     sf::Color frameColor = sf::Color::White;
     float interval = 2.0f;
+    bool randomMode = false;
     std::vector<SlotConfig> slots;
 };

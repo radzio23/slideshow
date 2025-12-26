@@ -6,8 +6,7 @@
 #include <vector>
 
 // Główna klasa aplikacji, która zarządza wszystkim.
-class App
-{
+class App {
 public:
     App();
     void run();
@@ -36,4 +35,17 @@ private:
     sf::Clock m_clock;
     int m_currentImageIndex = 0;
     int m_currentSlotIndex = 0;
+
+    // Zanikanie zdjęcia
+    bool m_isTransition = false;
+    float m_transitionTime = 0.0f;
+    float m_transitionDuration = 3.0f; // 1 sekunda = 0.5 fade out + 0.5 fade in
+    int m_fadingSlotIndex = -1;
+
+    sf::Texture m_oldTexture;
+    std::optional<sf::Sprite> m_oldSprite;
+
+    std::optional<sf::Sprite> m_oldFrameSprite;          // dla customfromfile
+    std::optional<sf::RectangleShape> m_oldFrameShape;   // dla simple/polaroid
+    bool m_oldFrameIsCustom = false;
 };
