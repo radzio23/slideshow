@@ -1,6 +1,6 @@
 ##### Ustawienia ogólne wyglądu
 ### Tło
-background tlo.jpg
+background nature.jpg
 ### Czas zmiany zdjęcia
 interval 2.0
 ### Typ ramki (none/simple/polaroid/customfromfile)

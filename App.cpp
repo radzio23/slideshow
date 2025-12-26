@@ -10,7 +10,7 @@ App::App() : m_config("config.txt"), m_window(sf::VideoMode::getDesktopMode(), "
     m_window.setMouseCursorVisible(false);
 
     // Wczytanie listy zdjęć
-    m_imagePaths = ImageLoader::scanDirectory("./images/");
+    m_imagePaths = ImageLoader::scanDirectory("./koty/");
 
     // Ustawienie tła
     setupBackground();
@@ -105,7 +105,7 @@ void App::update() {
 void App::render() {
     m_window.clear(sf::Color::Black);
 
-    // Tło
+    // 1. Tło
     if (m_hasBg) {
         m_window.draw(m_bgSprite);
     }
@@ -113,73 +113,77 @@ void App::render() {
     // Rysowanie slotów
     for (int i = 0; i < m_slots.size(); i++) {
 
-        // Jeśli ten slot jest w trakcie przejścia
+        // --- CZY TEN SLOT JEST W TRAKCIE ANIMACJI? ---
         if (m_isTransition && i == m_fadingSlotIndex) {
+
             float halfDuration = m_transitionDuration / 2.0f;
-            float tOld = 0.0f;
-            float tNew = 0.0f;
 
+            // ========================================================
+            // FAZA 1: Zanikanie STAREGO (0% -> 50%)
+            // ========================================================
             if (m_transitionTime < halfDuration) {
-                tOld = m_transitionTime / halfDuration;
-                tNew = 0.0f;
-            }
-            else {
-                tOld = 1.0f; // stary już zniknął
-                tNew = (m_transitionTime - halfDuration) / halfDuration;
-                if (tNew > 1.0f) tNew = 1.0f;
-            }
+                float t = m_transitionTime / halfDuration;
+                uint8_t alphaOld = static_cast<uint8_t>(255 * (1.0f - t));
 
-            // Fade-out stare zdjęcie + ramka
-            if (m_oldSprite.has_value()) {
-                sf::Sprite& oldSpr = m_oldSprite.value();
-                oldSpr.setColor(sf::Color(255, 255, 255, static_cast<uint8_t>(255 * (1.0f - tOld))));
-                m_window.draw(oldSpr);
-
-                // Ramka starego slotu
+                // 1. NAJPIERW Rysujemy STARĄ ramkę (żeby była POD spodem)
                 if (m_oldFrameIsCustom && m_oldFrameSprite.has_value()) {
-                    sf::Sprite& frame = m_oldFrameSprite.value();
-                    frame.setColor(sf::Color(255, 255, 255, static_cast<uint8_t>(255 * (1.0f - tOld))));
+                    sf::Sprite frame = m_oldFrameSprite.value();
+                    frame.setColor(sf::Color(255, 255, 255, alphaOld));
                     m_window.draw(frame);
                 }
                 else if (m_oldFrameShape.has_value()) {
-                    sf::RectangleShape& frame = m_oldFrameShape.value();
+                    sf::RectangleShape frame = m_oldFrameShape.value();
                     sf::Color c = frame.getFillColor();
-                    c.a = static_cast<uint8_t>(255 * (1.0f - tOld));
+                    c.a = alphaOld;
                     frame.setFillColor(c);
                     m_window.draw(frame);
                 }
+
+                // 2. POTEM Rysujemy STARE zdjęcie (na wierzchu)
+                if (m_oldSprite.has_value()) {
+                    sf::Sprite& oldSpr = m_oldSprite.value();
+                    oldSpr.setColor(sf::Color(255, 255, 255, alphaOld));
+                    m_window.draw(oldSpr);
+                }
             }
-
-            // Fade-in nowe zdjęcie + ramka
-            sf::Sprite& newSpr = m_slots[i].getSprite();
-            newSpr.setColor(sf::Color(255, 255, 255, static_cast<uint8_t>(255 * tNew)));
-            m_window.draw(newSpr);
-
-            m_slots[i].setFrameAlpha(static_cast<uint8_t>(255 * tNew));
-
-            // rysujemy ramkę na wierzchu z tym samym alpha
-            if (m_slots[i].getCustomFrameSprite().has_value()) {
-                const sf::Sprite& frame = *m_slots[i].getCustomFrameSprite();
-                sf::Color fc = frame.getColor();
-                fc.a = static_cast<uint8_t>(255 * tNew);
-                sf::Sprite frameCopy = frame;
-                frameCopy.setColor(fc);
-                m_window.draw(frameCopy);
-            }
+            // ========================================================
+            // FAZA 2: Pojawianie się NOWEGO (50% -> 100%)
+            // ========================================================
             else {
-                sf::RectangleShape& frame = m_slots[i].getShapeFrame();
-                sf::Color fc = frame.getFillColor();
-                fc.a = static_cast<uint8_t>(255 * tNew);
-                frame.setFillColor(fc);
-                m_window.draw(frame);
+                float t = (m_transitionTime - halfDuration) / halfDuration;
+                if (t > 1.0f) t = 1.0f;
+                uint8_t alphaNew = static_cast<uint8_t>(255 * t);
+
+                // 1. NAJPIERW Rysujemy NOWĄ ramkę (żeby była POD spodem)
+                m_slots[i].setFrameAlpha(alphaNew);
+
+                if (m_slots[i].getCustomFrameSprite().has_value()) {
+                    sf::Sprite frame = *m_slots[i].getCustomFrameSprite();
+                    frame.setColor(sf::Color(255, 255, 255, alphaNew));
+                    m_window.draw(frame);
+                }
+                else {
+                    sf::RectangleShape frame = m_slots[i].getShapeFrame();
+                    sf::Color fc = frame.getFillColor();
+                    fc.a = alphaNew;
+                    frame.setFillColor(fc);
+                    m_window.draw(frame);
+                }
+
+                // 2. POTEM Rysujemy NOWE zdjęcie (na wierzchu)
+                sf::Sprite& newSpr = m_slots[i].getSprite();
+                newSpr.setColor(sf::Color(255, 255, 255, alphaNew));
+                m_window.draw(newSpr);
             }
         }
+        // --- NORMALNE RYSOWANIE (INNE SLOTY) ---
         else {
-            // Normalne rysowanie slotu
+            // Tu musisz sprawdzić, jak działa funkcja draw() w klasie Slot.
+            // Prawdopodobnie tam też musisz zmienić kolejność, jeśli ramka zasłania.
             m_slots[i].draw(m_window, m_config.get().frameType);
         }
-        
     }
+    m_window.display();
     m_window.display();
 }
 
