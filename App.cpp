@@ -63,6 +63,8 @@ void App::update() {
         // Kopia starego zdjęcia
         m_oldTexture = m_slots[m_fadingSlotIndex].getTexture();
         m_oldSprite.emplace(m_oldTexture);
+
+        m_oldText = m_slots[m_fadingSlotIndex].getText();
         // Alfa starego zdjęcia na 255
         sf::Color cOld = m_oldSprite->getColor();
         cOld.a = 255;
@@ -145,6 +147,12 @@ void App::render() {
                     oldSpr.setColor(sf::Color(255, 255, 255, alphaOld));
                     m_window.draw(oldSpr);
                 }
+
+                if (m_oldText.has_value()) {
+                    sf::Text& oldText = m_oldText.value();
+                    oldText.setFillColor(sf::Color(0, 0, 0, alphaOld));
+                    m_window.draw(oldText);
+                }
             }
             // ========================================================
             // FAZA 2: Pojawianie się NOWEGO (50% -> 100%)
@@ -174,6 +182,10 @@ void App::render() {
                 sf::Sprite& newSpr = m_slots[i].getSprite();
                 newSpr.setColor(sf::Color(255, 255, 255, alphaNew));
                 m_window.draw(newSpr);
+
+                sf::Text& newText = m_slots[i].getText();
+                newText.setFillColor(sf::Color(0, 0, 0, alphaNew));
+                m_window.draw(newText);
             }
         }
         // --- NORMALNE RYSOWANIE (INNE SLOTY) ---

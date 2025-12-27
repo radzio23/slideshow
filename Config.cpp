@@ -69,6 +69,7 @@ Config::Config(const std::string &filename)
             if (m_appConfig.randomMode) return;
             SlotConfig sc;
             ss >> sc.x >> sc.y >> sc.width >> sc.height >> sc.rotation;
+            std::getline(ss, sc.text);
             m_appConfig.slots.push_back(sc);
         }
     }

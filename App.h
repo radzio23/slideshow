@@ -44,7 +44,7 @@ private:
 
     sf::Texture m_oldTexture;
     std::optional<sf::Sprite> m_oldSprite;
-
+    std::optional<sf::Text> m_oldText;
     std::optional<sf::Sprite> m_oldFrameSprite;          // dla customfromfile
     std::optional<sf::RectangleShape> m_oldFrameShape;   // dla simple/polaroid
     bool m_oldFrameIsCustom = false;

@@ -8,4 +8,5 @@ struct SlotConfig
     float width = 400.0f;
     float height = 300.0f;
     float rotation = 0.0f;
+    std::string text = "";
 };

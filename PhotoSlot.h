@@ -27,7 +27,7 @@ public:
     // Rysuje zawartość slotu (zdjęcie i ramkę) w podanym oknie.
     void draw(sf::RenderWindow &window, FrameType fType);
 
-    // Ustawia przezroczystość zdjęcia i ramki
+    // Ustawia przezroczystość zdjęcia, tekstu i ramki
     void setFrameAlpha(uint8_t a);
 
     // GETTERY
@@ -37,12 +37,20 @@ public:
     sf::Sprite& getSprite() { return m_photoSprite; }
     const sf::Sprite& getSprite() const { return m_photoSprite; }
 
+    sf::Text& getText() { return m_text; }
+    const sf::Text& getText() const { return m_text; }
+
+    sf::Font& getFont() { return m_font; }
+    const sf::Font& getFont() const { return m_font; }
+
     sf::RectangleShape& getShapeFrame() { return m_shapeFrame; }
     const std::optional<sf::Sprite>& getCustomFrameSprite() const { return m_customFrameSprite; }
 
 private:
     sf::Texture m_photoTexture;
     sf::Sprite m_photoSprite;
+    sf::Text m_text;
+    sf::Font m_font;
 
     sf::RectangleShape m_shapeFrame;
     std::optional<sf::Sprite> m_customFrameSprite;

@@ -1,7 +1,7 @@
 #include "PhotoSlot.h"
 #include <cmath>
 
-PhotoSlot::PhotoSlot() : m_photoSprite(m_photoTexture) {}
+PhotoSlot::PhotoSlot() : m_photoSprite(m_photoTexture), m_text(m_font) {}
 
 void PhotoSlot::setup(const SlotConfig &cfg, FrameType fType, sf::Color fColor, const sf::Texture *customFrameTex)
 {
@@ -31,6 +31,17 @@ void PhotoSlot::setup(const SlotConfig &cfg, FrameType fType, sf::Color fColor, 
         m_customFrameSprite->setOrigin({(float)frameSize.x / 2.0f, (float)frameSize.y / 2.0f});
         m_customFrameSprite->setPosition({m_config.x, m_config.y});
         m_customFrameSprite->setRotation(sf::degrees(m_config.rotation));
+    }
+
+    if (m_font.openFromFile("arial.ttf")) {
+        m_text.setFont(m_font);
+        m_text.setString(m_config.text);
+        m_text.setCharacterSize(18);
+        m_text.setFillColor(sf::Color::Black);
+        m_text.setOrigin(m_text.getLocalBounds().getCenter());
+        m_text.setRotation(sf::degrees(m_config.rotation));
+        float rad = m_config.rotation * 3.14159f / 180.0f;
+        m_text.setPosition(sf::Vector2f(m_config.x - sin(rad) * m_config.height / 2.0, m_config.y + cos(rad) * m_config.height / 2.0));
     }
 }
 
@@ -86,6 +97,10 @@ void PhotoSlot::draw(sf::RenderWindow &window, FrameType fType)
     {
         window.draw(m_photoSprite);
     }
+
+    if (!m_config.text.empty()) {
+        window.draw(m_text);
+    }
 }
 
 void PhotoSlot::setFrameAlpha(uint8_t a)
@@ -101,3 +116,4 @@ void PhotoSlot::setFrameAlpha(uint8_t a)
         m_shapeFrame.setFillColor(c);
     }
 }
+
