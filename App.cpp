@@ -10,7 +10,7 @@ App::App() : m_config("config.txt"), m_window(sf::VideoMode::getDesktopMode(), "
     m_window.setMouseCursorVisible(false);
 
     // Wczytanie listy zdjęć
-    m_imagePaths = ImageLoader::scanDirectory("./koty/");
+    m_imagePaths = ImageLoader::scanDirectory("./images/");
 
     // Ustawienie tła
     setupBackground();
@@ -183,7 +183,6 @@ void App::render() {
             m_slots[i].draw(m_window, m_config.get().frameType);
         }
     }
-    m_window.display();
     m_window.display();
 }
 
