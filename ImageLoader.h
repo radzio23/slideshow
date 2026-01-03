@@ -3,8 +3,8 @@
 #include <vector>
 #include <filesystem>
 
-// Przestrzeń nazw dla funkcji narzędziowych.
+// Zestaw narzędzi do przeszukiwania dysku w celu znalezienia obrazów.
 namespace ImageLoader {
-    // Skanuje podany katalog w poszukiwaniu plików graficznych.
-    std::vector<std::filesystem::path> scanDirectory(const std::string &path);
+    // Przeszukuje wskazany folder i tworzy listę ścieżek do plików PNG i JPG.
+    std::vector<std::filesystem::path> scanDirectory(const std::string& path);
 }

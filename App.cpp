@@ -3,36 +3,35 @@
 #include <ctime>
 #include <iostream>
 #include <random>
+#include <algorithm>
 
-// Tworzenie okna fullscreen
+// Inicjalizuje okno w trybie pełnoekranowym, wczytuje ścieżki do zdjęć oraz ustawia tło i sloty.
 App::App() : m_config("config.txt"), m_window(sf::VideoMode::getDesktopMode(), "Slideshow", sf::State::Fullscreen), m_bgSprite(m_bgTexture) {
     m_window.setFramerateLimit(60);
     m_window.setMouseCursorVisible(false);
 
-    // Wczytanie listy zdjęć
     m_imagePaths = ImageLoader::scanDirectory("./images/");
-
-    // Ustawienie tła
     setupBackground();
-
-    // Utworzenie slotów
     setupSlots();
 }
 
+// Główna pętla programu.
 void App::run() {
     while (m_window.isOpen()) {
-        processEvents();
-        update();
-        render();
+        processEvents(); // Obsługa zdarzeń
+        update();        // Logika i animacje
+        render();        // Rysowanie klatek
     }
 }
 
+//Obsługa zdarzeń systemowych.
 void App::processEvents() {
     while (const std::optional<sf::Event> event = m_window.pollEvent()) {
         if (event->is<sf::Event::Closed>()) {
             m_window.close();
         }
         if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+            // Zamknięcie aplikacji po naciśnięciu ESC
             if (keyPressed->code == sf::Keyboard::Key::Escape) {
                 m_window.close();
             }
@@ -40,170 +39,12 @@ void App::processEvents() {
     }
 }
 
-void App::update() {
-    // Jeśli trwa animacja fade
-    if (m_isTransition) {
-
-        m_transitionTime += m_clock.restart().asSeconds();
-        float halfDuration = m_transitionDuration / 2.0f;
-
-        if (m_transitionTime >= m_transitionDuration) {
-            m_isTransition = false;
-            m_fadingSlotIndex = -1;
-        }
-
-        return; // nie zmieniamy zdjęć w trakcie animacji
-    }
-
-    // Normalna zmiana zdjęcia
-    if (m_clock.getElapsedTime().asSeconds() > m_config.get().interval) {
-        // Start animacji
-        m_fadingSlotIndex = m_currentSlotIndex;
-
-        // Kopia starego zdjęcia
-        m_oldTexture = m_slots[m_fadingSlotIndex].getTexture();
-        m_oldSprite.emplace(m_oldTexture);
-
-        m_oldText = m_slots[m_fadingSlotIndex].getText();
-        // Alfa starego zdjęcia na 255
-        sf::Color cOld = m_oldSprite->getColor();
-        cOld.a = 255;
-        m_oldSprite->setColor(cOld);
-        m_oldSprite->setScale(m_slots[m_fadingSlotIndex].getSprite().getScale());
-        m_oldSprite->setOrigin(m_slots[m_fadingSlotIndex].getSprite().getOrigin());
-        m_oldSprite->setPosition(m_slots[m_fadingSlotIndex].getSprite().getPosition());
-        m_oldSprite->setRotation(m_slots[m_fadingSlotIndex].getSprite().getRotation());
-
-        // Stara ramka
-        m_oldFrameIsCustom = m_slots[m_fadingSlotIndex].getCustomFrameSprite().has_value();
-        if (m_oldFrameIsCustom)
-            m_oldFrameSprite = *m_slots[m_fadingSlotIndex].getCustomFrameSprite();
-        else
-            m_oldFrameShape = m_slots[m_fadingSlotIndex].getShapeFrame();
-
-        // Załaduj nowe zdjęcie
-        if (!m_slots.empty() && !m_imagePaths.empty()) {
-            m_slots[m_currentSlotIndex].loadImage(m_imagePaths[m_currentImageIndex], m_config.get().frameType);
-
-            // Alfa nowego zdjęcia na 0 (żeby nie przykryło starego)
-            sf::Sprite& newSpr = m_slots[m_currentSlotIndex].getSprite();
-            sf::Color c = newSpr.getColor();
-            c.a = 0;
-            newSpr.setColor(c);
-
-
-            // Indeksy
-            m_currentImageIndex = (m_currentImageIndex + 1) % m_imagePaths.size();
-            m_currentSlotIndex = (m_currentSlotIndex + 1) % m_slots.size();
-        }
-
-        // Start animacji
-        m_isTransition = true;
-        m_transitionTime = 0.0f;
-        m_clock.restart();
-    }
-}
-
-void App::render() {
-    m_window.clear(sf::Color::Black);
-
-    // 1. Tło
-    if (m_hasBg) {
-        m_window.draw(m_bgSprite);
-    }
-
-    // Rysowanie slotów
-    for (int i = 0; i < m_slots.size(); i++) {
-
-        // --- CZY TEN SLOT JEST W TRAKCIE ANIMACJI? ---
-        if (m_isTransition && i == m_fadingSlotIndex) {
-
-            float halfDuration = m_transitionDuration / 2.0f;
-
-            // ========================================================
-            // FAZA 1: Zanikanie STAREGO (0% -> 50%)
-            // ========================================================
-            if (m_transitionTime < halfDuration) {
-                float t = m_transitionTime / halfDuration;
-                uint8_t alphaOld = static_cast<uint8_t>(255 * (1.0f - t));
-
-                // 1. NAJPIERW Rysujemy STARĄ ramkę (żeby była POD spodem)
-                if (m_oldFrameIsCustom && m_oldFrameSprite.has_value()) {
-                    sf::Sprite frame = m_oldFrameSprite.value();
-                    frame.setColor(sf::Color(255, 255, 255, alphaOld));
-                    m_window.draw(frame);
-                }
-                else if (m_oldFrameShape.has_value()) {
-                    sf::RectangleShape frame = m_oldFrameShape.value();
-                    sf::Color c = frame.getFillColor();
-                    c.a = alphaOld;
-                    frame.setFillColor(c);
-                    m_window.draw(frame);
-                }
-
-                // 2. POTEM Rysujemy STARE zdjęcie (na wierzchu)
-                if (m_oldSprite.has_value()) {
-                    sf::Sprite& oldSpr = m_oldSprite.value();
-                    oldSpr.setColor(sf::Color(255, 255, 255, alphaOld));
-                    m_window.draw(oldSpr);
-                }
-
-                if (m_oldText.has_value()) {
-                    sf::Text& oldText = m_oldText.value();
-                    oldText.setFillColor(sf::Color(0, 0, 0, alphaOld));
-                    m_window.draw(oldText);
-                }
-            }
-            // ========================================================
-            // FAZA 2: Pojawianie się NOWEGO (50% -> 100%)
-            // ========================================================
-            else {
-                float t = (m_transitionTime - halfDuration) / halfDuration;
-                if (t > 1.0f) t = 1.0f;
-                uint8_t alphaNew = static_cast<uint8_t>(255 * t);
-
-                // 1. NAJPIERW Rysujemy NOWĄ ramkę (żeby była POD spodem)
-                m_slots[i].setFrameAlpha(alphaNew);
-
-                if (m_slots[i].getCustomFrameSprite().has_value()) {
-                    sf::Sprite frame = *m_slots[i].getCustomFrameSprite();
-                    frame.setColor(sf::Color(255, 255, 255, alphaNew));
-                    m_window.draw(frame);
-                }
-                else {
-                    sf::RectangleShape frame = m_slots[i].getShapeFrame();
-                    sf::Color fc = frame.getFillColor();
-                    fc.a = alphaNew;
-                    frame.setFillColor(fc);
-                    m_window.draw(frame);
-                }
-
-                // 2. POTEM Rysujemy NOWE zdjęcie (na wierzchu)
-                sf::Sprite& newSpr = m_slots[i].getSprite();
-                newSpr.setColor(sf::Color(255, 255, 255, alphaNew));
-                m_window.draw(newSpr);
-
-                sf::Text& newText = m_slots[i].getText();
-                newText.setFillColor(sf::Color(0, 0, 0, alphaNew));
-                m_window.draw(newText);
-            }
-        }
-        // --- NORMALNE RYSOWANIE (INNE SLOTY) ---
-        else {
-            // Tu musisz sprawdzić, jak działa funkcja draw() w klasie Slot.
-            // Prawdopodobnie tam też musisz zmienić kolejność, jeśli ramka zasłania.
-            m_slots[i].draw(m_window, m_config.get().frameType);
-        }
-    }
-    m_window.display();
-}
-
+// Wczytuje teksturę tła z konfiguracji i skaluje ją do rozmiaru ekranu.
 void App::setupBackground() {
     const auto& appCfg = m_config.get();
     if (!appCfg.backgroundFile.empty() && m_bgTexture.loadFromFile(appCfg.backgroundFile)) {
         m_hasBg = true;
         m_bgTexture.setSmooth(true);
-        // Upewniamy się, że sprite korzysta z załadowanej tekstury
         m_bgSprite.setTexture(m_bgTexture, true);
 
         sf::Vector2u winSize = m_window.getSize();
@@ -212,62 +53,175 @@ void App::setupBackground() {
     }
 }
 
+// Inicjalizuje sloty na zdjęcia na podstawie pliku config.txt lub przygotowuje tryb losowy.
 void App::setupSlots() {
-    auto appCfg = m_config.get(); // Kopia, by móc modyfikować
+    const auto& appCfg = m_config.get();
 
-    // Ramka customowa
     if (appCfg.frameType == FrameType::CustomFromFile) {
         if (m_customFrameTexture.loadFromFile(appCfg.frameFilePath)) {
             m_customFrameTexture.setSmooth(true);
         }
-        else {
-            std::cerr << "Nie udalo sie wczytac ramki z pliku: " << appCfg.frameFilePath << std::endl;
-            appCfg.frameType = FrameType::Simple; // Powrót do prostej ramki
-        }
     }
 
-    // Tryb losowy
+    m_slots.clear();
+
     if (appCfg.randomMode) {
+        // W trybie losowym zdjęcia będą tworzone dynamicznie w funkcji update()
         std::srand(static_cast<unsigned>(std::time(nullptr)));
-
-        int count = 5; // liczba losowych zdjęć na ekranie 
-        m_slots.reserve(count); 
-
-        for (int i = 0; i < count; i++) { 
-            SlotConfig cfg;
-
-            // losowa pozycja 
-            cfg.x = std::rand() % (m_window.getSize().x - static_cast<unsigned>(cfg.width));
-            cfg.y = std::rand() % (m_window.getSize().y - static_cast<unsigned>(cfg.height));
-           
-            // losowy obrót 
-            cfg.rotation = std::rand() % 360;
-
-            m_slots.emplace_back(); 
-            m_slots.back().setup(cfg, appCfg.frameType, appCfg.frameColor, 
-                (appCfg.frameType == FrameType::CustomFromFile ? &m_customFrameTexture : nullptr)); 
-        } 
-
-        // Tasowanie kolejności zdjęć 
-        std::shuffle(m_imagePaths.begin(), m_imagePaths.end(), std::mt19937{std::random_device{}()});
-    } else {
-        // Normalny tryb slotów zdefiniowany w config.txt
-        m_slots.reserve(appCfg.slots.size());
-        for (const auto& slotCfg : appCfg.slots) {
-            m_slots.emplace_back();
-            m_slots.back().setup(slotCfg, appCfg.frameType, appCfg.frameColor,
-                (appCfg.frameType == FrameType::CustomFromFile ? &m_customFrameTexture : nullptr));
-        }
-    }
-
-    // Wstępne wypełnienie
-    if (!m_imagePaths.empty()) {
-        for (auto& slot : m_slots) {
-            slot.loadImage(m_imagePaths[m_currentImageIndex], appCfg.frameType);
-            m_currentImageIndex = (m_currentImageIndex + 1) % m_imagePaths.size();
-        }
+        std::shuffle(m_imagePaths.begin(), m_imagePaths.end(), std::mt19937{ std::random_device{}() });
     }
     else {
-        std::cerr << "Brak zdjec w folderze ./images/!" << std::endl;
+        // W trybie statycznym tworzymy sloty zgodnie z definicją w config.txt
+        for (const auto& slotCfg : appCfg.slots) {
+            auto newSlot = std::make_unique<PhotoSlot>();
+            newSlot->setup(slotCfg, appCfg.frameType, appCfg.frameColor,
+                (appCfg.frameType == FrameType::CustomFromFile ? &m_customFrameTexture : nullptr));
+            if (!m_imagePaths.empty()) {
+                newSlot->loadImage(m_imagePaths[m_currentImageIndex], appCfg.frameType);
+                m_currentImageIndex = (m_currentImageIndex + 1) % m_imagePaths.size();
+            }
+            m_slots.push_back(std::move(newSlot));
+        }
     }
+}
+
+// Aktualizacja logiki aplikacji.
+void App::update() {
+    const auto& appCfg = m_config.get();
+
+    if (m_isTransition) {
+        float dt = m_clock.restart().asSeconds();
+        float oldTime = m_transitionTime;
+        m_transitionTime += dt;
+
+        // Podmiana obrazka w połowie czasu animacji (tylko w trybie statycznym)
+        if (!appCfg.randomMode) {
+            if (oldTime < m_transitionDuration / 2.0f && m_transitionTime >= m_transitionDuration / 2.0f) {
+                if (!m_slots.empty()) {
+                    m_slots[m_currentSlotIndex]->loadImage(m_imagePaths[m_currentImageIndex], appCfg.frameType);
+                    m_currentImageIndex = (m_currentImageIndex + 1) % m_imagePaths.size();
+                }
+            }
+        }
+
+        // Zakończenie animacji po upływie czasu trwania
+        if (m_transitionTime >= m_transitionDuration) {
+            m_isTransition = false;
+        }
+        return;
+    }
+
+    // Sprawdzenie czy minął interwał czasu wyświetlania zdjęcia
+    if (m_clock.getElapsedTime().asSeconds() > appCfg.interval) {
+        if (m_imagePaths.empty()) return;
+
+        if (appCfg.randomMode) {
+            // Tworzenie nowego zdjęcia w losowym punkcie ekranu
+            auto newSlot = std::make_unique<PhotoSlot>();
+            SlotConfig cfg;
+            float margin = 250.0f;
+            cfg.x = static_cast<float>(std::rand() % (int)(m_window.getSize().x - margin * 2) + margin);
+            cfg.y = static_cast<float>(std::rand() % (int)(m_window.getSize().y - margin * 2) + margin);
+            cfg.rotation = static_cast<float>(std::rand() % 60 - 30);
+
+            newSlot->setup(cfg, appCfg.frameType, appCfg.frameColor,
+                (appCfg.frameType == FrameType::CustomFromFile ? &m_customFrameTexture : nullptr));
+
+            newSlot->loadImage(m_imagePaths[m_currentImageIndex], appCfg.frameType);
+            m_slots.push_back(std::move(newSlot));
+
+            // Maksymalnie 20 zdjęć na ekranie
+            if (m_slots.size() > 20) m_slots.erase(m_slots.begin());
+            m_currentImageIndex = (m_currentImageIndex + 1) % m_imagePaths.size();
+        }
+        else {
+            // Przejście do następnego slotu w trybie statycznym
+            if (!m_slots.empty()) {
+                m_currentSlotIndex = (m_currentSlotIndex + 1) % m_slots.size();
+            }
+        }
+
+        // Rozpoczęcie nowej animacji przejścia
+        m_isTransition = true;
+        m_transitionTime = 0.0f;
+        m_clock.restart();
+    }
+}
+
+// Renderowanie wszystkich elementów graficznych.
+void App::render() {
+    m_window.clear(sf::Color::Black);
+    if (m_hasBg) m_window.draw(m_bgSprite);
+
+    const auto& appCfg = m_config.get();
+
+    for (size_t i = 0; i < m_slots.size(); i++) {
+        bool isCurrentFading = m_isTransition && (i == (appCfg.randomMode ? m_slots.size() - 1 : m_currentSlotIndex));
+
+        if (isCurrentFading) {
+            float t_total = std::min(1.0f, m_transitionTime / m_transitionDuration);
+            float half = m_transitionDuration / 2.0f;
+            uint8_t alpha = 0;
+            float currentDropScale = 1.0f;
+
+            if (appCfg.randomMode) {
+                // Animacja spadania zdjęcia
+                alpha = static_cast<uint8_t>(255 * t_total);
+                currentDropScale = 2.0f - t_total;
+            }
+            else {
+                // fade-out/fade-in
+                if (m_transitionTime < half) {
+                    alpha = static_cast<uint8_t>(255 * (1.0f - (m_transitionTime / half)));
+                }
+                else {
+                    alpha = static_cast<uint8_t>(255 * ((m_transitionTime - half) / half));
+                }
+            }
+
+            auto& slot = *m_slots[i];
+
+            // Rysowanie ramki
+                std::cout << "SIGMA";
+            if (appCfg.frameType == FrameType::CustomFromFile) {
+                auto frameOpt = slot.getCustomFrameSprite();
+                if (frameOpt.has_value()) {
+                    sf::Sprite frame = *frameOpt;
+                    frame.setColor(sf::Color(255, 255, 255, alpha));
+                    frame.setScale(frame.getScale() * currentDropScale);
+                    m_window.draw(frame);
+                }
+            }
+            else if (appCfg.frameType != FrameType::None) {
+                sf::RectangleShape frame = slot.getShapeFrame();
+                sf::Color fc = frame.getFillColor();
+                fc.a = alpha;
+                frame.setFillColor(fc);
+                frame.setScale(frame.getScale() * currentDropScale);
+                m_window.draw(frame);
+            }
+
+            // Rysowanie zdjęcia
+            sf::Sprite& spr = slot.getSprite();
+            sf::Vector2f sprScale = spr.getScale();
+            spr.setColor(sf::Color(255, 255, 255, alpha));
+            spr.setScale(sprScale * currentDropScale);
+            m_window.draw(spr);
+            spr.setScale(sprScale);
+
+            // Rysowanie tekstu (ramka polaroid)
+            if (appCfg.frameType == FrameType::Polaroid) {
+                sf::Text& txt = slot.getText();
+                sf::Color tc = txt.getFillColor();
+                tc.a = alpha;
+                txt.setFillColor(tc);
+                m_window.draw(txt);
+            }
+        }
+        else {
+            // Standardowe rysowanie
+            m_slots[i]->draw(m_window, appCfg.frameType);
+        }
+    }
+    m_window.display();
 }

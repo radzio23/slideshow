@@ -3,16 +3,16 @@
 #include "AppConfig.h"
 #include <string>
 
-// Klasa odpowiedzialna za parsowanie pliku konfiguracyjnego.
+// Klasa odpowiedzialna za wczytywanie i przetwarzanie pliku tekstowego z ustawieniami.
 class Config
 {
 public:
-    // W konstruktorze wczytuje i parsuje plik.
-    Config(const std::string &filename);
-
-    // Zwraca stałą referencję do wczytanej konfiguracji.
-    const AppConfig &get() const;
+    // Otwiera plik o podanej nazwie i parsuje jego zawartość.
+    Config(const std::string& filename);
+        
+    // Daje dostęp do struktury przechowującej wszystkie parametry aplikacji.
+    const AppConfig& get() const;
 
 private:
-    AppConfig m_appConfig;
+    AppConfig m_appConfig; // Obiekt przechowujący aktualną konfigurację.
 };

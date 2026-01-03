@@ -6,14 +6,14 @@
 #include "FrameType.h"
 #include "SlotConfig.h"
 
-// Przechowuje wszystkie wczytane z pliku ustawienia aplikacji.
+// Kontener na wszystkie ustawienia aplikacji pobrane z konfiguracji.
 struct AppConfig
 {
-    std::string backgroundFile;
-    FrameType frameType = FrameType::Simple;
-    std::string frameFilePath;
-    sf::Color frameColor = sf::Color::White;
-    float interval = 2.0f;
-    bool randomMode = false;
-    std::vector<SlotConfig> slots;
+    std::string backgroundFile;              // Œcie¿ka do pliku z t³em.
+    FrameType frameType = FrameType::Simple; // Styl ramki.
+    std::string frameFilePath;               // Œcie¿ka do pliku tekstury ramki niestandardowej.
+    sf::Color frameColor = sf::Color::White; // Kolor obramowania.
+    float interval = 2.0f;                   // Czas w sekundach miêdzy zmianami zdjêæ.
+    bool randomMode = false;                 // Czy zdjêcia maj¹ byæ losowane.
+    std::vector<SlotConfig> slots;           // Lista definicji poszczególnych miejsc na zdjêcia.
 };

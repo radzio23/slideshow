@@ -2,18 +2,16 @@
 ### Tło
 background nature.jpg
 ### Czas zmiany zdjęcia
-interval 2.0
-### Typ ramki (none/simple/polaroid/customfromfile)
+interval 1.0
+### Typ ramki (none/simple/polaroid/nazwa pliku z obrazem ramki)
 frame_type polaroid
-### Własna ramka
-frame_file ramka.jpg
 ### Kolor ramki
-frame_color 0 176 176
+frame_color 255 255 255
 ### Tryb losowy (true/false)
-random_mode false
+random_mode true
 
 ##### Definicje slotów na zdjęcia (slot [x] [y] [szerokość] [wysokość] [obrót])
-slot 500 250 400 300 -45 23.10.2022
+slot 500 250 400 300 -15 23.10.2022
 slot 1200 250 350 250 0 11.04.2019
-slot 500 750 400 300 45	14.05.2005
-slot 1200 750 450 350 90 06.07.2025
+slot 500 750 400 300 15	14.05.2005
+slot 1200 750 450 350 30 06.07.2025
