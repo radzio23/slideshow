@@ -1,0 +1,250 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{indentfirst}
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+
+\title{Nietypowy pokaz slajdów \\ \large Dokumentacja projektu}
+\author{Zofia Jedlińska, Radosław Firlej, Alicja Borek}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Tytuł projektu i autorzy}
+\textbf{Tytuł:} Nietypowy pokaz slajdów (Projekt nr 41) \\
+\textbf{Autorzy:}
+\begin{itemize}
+    \item \textbf{Zosia} – konfiguracja, struktury danych, parser pliku konfiguracyjnego
+    \item \textbf{Radek} – moduł PhotoSlot, ramki, skalowanie, rotacja, renderowanie zdjęć
+    \item \textbf{Alicja} – główna aplikacja, pętla programu, obsługa zdarzeń SFML 3, zarządzanie slotami i obrazami
+\end{itemize}
+
+\section{Opis projektu}
+Celem projektu było stworzenie programu wyświetlającego nietypowy pokaz slajdów w trybie pełnoekranowym. W przeciwieństwie do klasycznych prezentacji, zdjęcia nie są wyświetlane pojedynczo, lecz w wielu pozycjach jednocześnie, zgodnie z konfiguracją z pliku. Program cyklicznie podmienia zdjęcia w wybranych slotach, umożliwia stosowanie ramek, tła oraz rotacji. Projekt został wykonany z użyciem biblioteki \textbf{SFML 3}.
+
+\section{Założenia wstępne}
+\begin{itemize}
+    \item Program działa w trybie pełnoekranowym.
+    \item Zdjęcia są pobierane z katalogu \texttt{./images/}.
+    \item Konfiguracja (pozycje, rozmiary, kąty, ramki, tło, interwał) znajduje się w pliku \texttt{config.txt}.
+    \item Każdy slot wyświetla jedno zdjęcie, które jest cyklicznie podmieniane.
+    \item Dostępne rodzaje ramek: brak, prosta, polaroid lub z pliku graficznego.
+    \item Program nie posiada interfejsu GUI — działa autonomicznie.
+    \item Wymagane jest płynne renderowanie i poprawne skalowanie zdjęć.
+    \item Dodatkowo: tryb losowy oraz płynne przechodzenie z jednego zdjęcia w drugie.
+\end{itemize}
+
+\section{Analiza projektu}
+
+\subsection{Dane wejściowe}
+\begin{itemize}
+    \item Plik \texttt{config.txt} zawierający:
+    \begin{itemize}
+        \item ścieżkę do tła,
+        \item interwał czasowy,
+        \item typ ramki,
+        \item ścieżkę do ramki (w przypadku customowej ramki),
+        \item kolor ramki,
+        \item tryb losowy,
+        \item listę slotów: pozycja (x,y), rozmiar (w,h), rotacja.
+    \end{itemize}
+    \item Pliki graficzne w folderze \texttt{./images/} w możliwych formatach: \texttt{.png}, \texttt{.jpg}, \texttt{.jpeg}.
+\end{itemize}
+
+\subsection{Dane wyjściowe}
+\begin{itemize}
+    \item Renderowany w czasie rzeczywistym pokaz slajdów.
+    \item Wyświetlane zdjęcia z ramkami i rotacją.
+    \item Tło dopasowane do rozdzielczości ekranu.
+\end{itemize}
+
+\subsection{Struktury danych tu nwm czy sa wszystkie}
+\begin{itemize}
+    \item \texttt{FrameType} – typ ramki.
+    \item \texttt{SlotConfig} – konfiguracja pojedynczego slotu.
+    \item \texttt{AppConfig} – pełna konfiguracja aplikacji.
+    \item \texttt{PhotoSlot} – klasa odpowiedzialna za zdjęcie i ramkę.
+    \item \texttt{std::vector<PhotoSlot>} – aktywne sloty.
+    \item \texttt{std::vector<std::filesystem::path>} – lista zdjęć.
+\end{itemize}
+
+\subsection{Interfejs użytkownika}
+Program nie posiada klasycznego interfejsu użytkownika. Jedyną formą interakcji jest:
+\begin{itemize}
+    \item klawisz \textbf{ESC} – zamknięcie programu.
+\end{itemize}
+
+\subsection{Wyodrębnienie modułów}
+\begin{itemize}
+    \item \textbf{Moduł konfiguracji (Zosia)} – wczytywanie i przechowywanie ustawień.
+    \item \textbf{Moduł PhotoSlot (Radek)} – renderowanie zdjęć, ramki, transformacje.
+    \item \textbf{Moduł aplikacji (Alicja)} – pętla główna, zdarzenia, zarządzanie slotami, ładowanie zdjęć.
+\end{itemize}
+
+\subsection{Narzędzia programistyczne}
+\begin{itemize}
+    \item Środowisko: \textbf{Visual Studio 2022}
+    \item Biblioteka graficzna: \textbf{SFML 3}
+    \item System budowania: CMake
+    \item System operacyjny: Windows
+\end{itemize}
+
+\section{Podział pracy i analiza czasowa}
+
+\subsection*{Zosia}
+\begin{itemize}
+    \item Struktury danych – 4h
+    \item Parser pliku konfiguracyjnego – 2,5h
+    \item Testy konfiguracji – 1,5h
+\end{itemize}
+
+\subsection*{Radek}
+\begin{itemize}
+    \item Implementacja PhotoSlot – 6h
+    \item Ramki: simple, polaroid, custom – 4h
+    \item Skalowanie i rotacja zdjęć – 3h
+\end{itemize}
+
+\subsection*{Alicja}
+\begin{itemize}
+    \item Klasa App – 6h
+    \item Tryb losowy i płynne przechodzenie – 2h
+    \item Ładowanie zdjęć i zarządzanie slotami – 4h
+    \item Integracja modułów – 3h
+\end{itemize}
+
+\subsection*{Dokumentacja}
+Każdy z nas zajmował się pisaniem dokumentacji, czasowo można przyjąć, że zajęło nam to 1 dzień.
+
+\section{Algorytmy}
+\subsection{Skanowanie katalogu ze zdjęciami}
+\begin{enumerate}
+    \item Iteracja po katalogu zapisanego w zmiennej \texttt{path} za pomocą \texttt{std::filesystem::directory\_iterator}.
+    \item Sprawdzenie, czy aktualny wpis jest plikiem regularnym.
+    \item Pobranie rozszerzenia pliku do zmiennej \texttt{ext}.
+    \item Konwersja rozszerzenia na małe litery w celu ujednolicenia porównań.
+    \item Sprawdzenie, czy \texttt{ext} należy do zbioru dozwolonych formatów.
+    \item Dodanie poprawnej ścieżki do wektora \texttt{imagePaths}.
+    \item Posortowanie wektora \texttt{imagePaths} alfabetycznie.
+\end{enumerate}
+
+\subsection{Inicjalizacja aplikacji}
+\begin{enumerate}
+    \item Utworzenie okna aplikacji i zapisanie go w zmiennej \texttt{m\_window}.
+    \item Ustawienie limitu liczby klatek na sekundę przy użyciu \texttt{m\_window.setFramerateLimit()}.
+    \item Ukrycie kursora myszy poprzez \texttt{m\_window.setMouseCursorVisible(false)}.
+    \item Wczytanie listy zdjęć do wektora \texttt{m\_imagePaths}.
+    \item Inicjalizacja tła aplikacji przy użyciu zmiennej \texttt{m\_bgSprite}.
+    \item Utworzenie slotów na podstawie konfiguracji zapisanej w \texttt{m\_slots}.
+\end{enumerate}
+
+\subsection{Główna pętla aplikacji}
+\begin{enumerate}
+    \item Sprawdzenie, czy okno \texttt{m\_window} jest nadal otwarte.
+    \item Wywołanie funkcji \texttt{processEvents()} obsługującej zdarzenia.
+    \item Aktualizacja stanu aplikacji w metodzie \texttt{update()}.
+    \item Renderowanie sceny przy użyciu metody \texttt{render()}.
+\end{enumerate}
+
+\subsection{Obsługa zdarzeń SFML}
+\begin{enumerate}
+    \item Pobranie zdarzenia do zmiennej \texttt{event} za pomocą \texttt{m\_window.pollEvent()}.
+    \item Sprawdzenie, czy zdarzenie jest typu \texttt{sf::Event::Closed}.
+    \item Zamknięcie okna \texttt{m\_window} w przypadku zdarzenia zamknięcia.
+    \item Sprawdzenie zdarzenia klawiatury \texttt{sf::Event::KeyPressed}.
+    \item Zamknięcie aplikacji po wykryciu klawisza \texttt{Escape}.
+\end{enumerate}
+
+\subsection{Losowe rozmieszczanie slotów}
+\begin{enumerate}
+    \item Ustalenie rozmiaru okna na podstawie \texttt{m\_window.getSize()}.
+    \item Losowanie współrzędnych \texttt{cfg.x} oraz \texttt{cfg.y}.
+    \item Ograniczenie wartości \texttt{cfg.x} i \texttt{cfg.y} o szerokość i wysokość slotu.
+    \item Losowanie kąta obrotu zapisywanego w zmiennej \texttt{cfg.rotation}.
+    \item Inicjalizacja slotu na podstawie struktury \texttt{cfg}.
+    \item Przetasowanie kolejności zdjęć w wektorze \texttt{m\_imageFiles}.
+\end{enumerate}
+
+\subsection{Rotacyjna podmiana zdjęć}
+\begin{enumerate}
+    \item Zwiększanie licznika czasu \texttt{m\_clock}.
+    \item Porównanie \texttt{m\_clock} z wartością \texttt{interval}.
+    \item Wybór slotu o indeksie \texttt{m\_currentSlotIndex}.
+    \item Załadowanie nowego obrazu z wektora \texttt{m\_imagePaths}.
+    \item Zwiększenie indeksów \texttt{m\_currentSlotIndex} oraz \texttt{m\_currentImageIndex}.
+    \item Zresetowanie licznika czasu \texttt{m\_clock}.
+\end{enumerate}
+
+\subsection{Przejście typu fade}
+\begin{enumerate}
+    \item Obliczenie postępu animacji na podstawie zmiennej \texttt{m\_transitionTime}.
+    \item Stopniowe zmniejszanie wartości kanału alfa starego obrazu.
+    \item Stopniowe zwiększanie wartości kanału alfa nowego obrazu.
+    \item Przypisanie zmodyfikowanych kolorów do sprite'ów.
+    \item Zakończenie animacji po osiągnięciu pełnej widoczności.
+\end{enumerate}
+
+\subsection{Renderowanie sceny}
+\begin{enumerate}
+    \item Wyczyszczenie okna \texttt{m\_window}.
+    \item Narysowanie tła przy użyciu \texttt{m\_bgSprite}.
+    \item Iteracja po wektorze \texttt{m\_slots} i rysowanie slotów.
+    \item Rysowanie slotu aktualnie animowanego.
+    \item Wyświetlenie zawartości okna metodą \texttt{m\_window.display()}.
+\end{enumerate}
+
+\subsection{Skalowanie zdjęcia}
+\begin{enumerate}
+    \item Pobranie rozmiaru tekstury.
+    \item Obliczenie skali: \texttt{scale = min(width/texW, height/texH)}.
+    \item Ustawienie środka obrotu na środek zdjęcia.
+\end{enumerate}
+
+\subsection{Rysowanie ramki}
+\begin{itemize}
+    \item \textbf{Simple}: prostokąt o stałym marginesie.
+    \item \textbf{Polaroid}: większy margines dolny.
+    \item \textbf{Custom}: sprite ramki skalowany do rozmiaru slotu.
+\end{itemize}
+
+\section{Kodowanie}
+Projekt został podzielony na moduły:
+\begin{itemize}
+    \item \texttt{Config.h/cpp} – konfiguracja
+    \item \texttt{PhotoSlot.h/cpp} – renderowanie zdjęć
+    \item \texttt{App.h/cpp} – główna aplikacja
+    \item \texttt{ImageLoader.h/cpp} – ładowanie zdjęć
+\end{itemize}
+
+\section{Testowanie}
+\subsection{Testy jednostkowe}
+\begin{itemize}
+    \item Test poprawności wczytywania konfiguracji.
+    \item Test skalowania zdjęć.
+    \item Test rysowania ramek.
+\end{itemize}
+
+\subsection{Testy integracyjne}
+\begin{itemize}
+    \item Test poprawnej współpracy App + PhotoSlot.
+    \item Test cyklicznej podmiany zdjęć.
+\end{itemize}
+
+\subsection{Testy całościowe}
+\begin{itemize}
+    \item Uruchomienie programu z różnymi zestawami zdjęć (random zdjęcia i kotki)
+    \item Test działania w różnych rozdzielczościach ekranu (dla różnego rozmiaru tła).
+\end{itemize}
+
+\section{Wdrożenie i wnioski}
+Projekt spełnia wszystkie wymagania podstawowe. Program działa płynnie, poprawnie skaluje zdjęcia i obsługuje ramki. Działają płynne przejścia między zdjęciami oraz jest możliwość ustawienia trybu losowego. W przyszłości można dodać:
+\begin{itemize}
+    \item rozrzucanie kolejnych zdjęć,
+    \item podpisy pod zdjęciami.
+\end{itemize}
+
+\end{document}
