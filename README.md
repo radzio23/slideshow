@@ -10,7 +10,7 @@ Interaktywna aplikacja do wyświetlania pokazu slajdów z dynamicznymi animacjam
 
 ## Jak używać?
 1. Umieść zdjęcia w folderze `/images/`.
-2. Skonfiguruj plik `config.txt` (ustaw `interval`, `frame_type` oraz `sloty`).
+2. Skonfiguruj plik `config.txt` (ustaw `random_mode`, `interval`, `frame_type` oraz `sloty`).
 3. Uruchom aplikację.
 
 ## Wymagania
