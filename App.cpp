@@ -130,8 +130,8 @@ void App::update() {
             newSlot->loadImage(m_imagePaths[m_currentImageIndex], appCfg.frameType);
             m_slots.push_back(std::move(newSlot));
 
-            // Maksymalnie 20 zdjęć na ekranie
-            if (m_slots.size() > 20) m_slots.erase(m_slots.begin());
+            // Maksymalnie 11 zdjęć na ekranie
+            if (m_slots.size() > 11) m_slots.erase(m_slots.begin());
             m_currentImageIndex = (m_currentImageIndex + 1) % m_imagePaths.size();
         }
         else {
@@ -182,7 +182,6 @@ void App::render() {
             auto& slot = *m_slots[i];
 
             // Rysowanie ramki
-                std::cout << "SIGMA";
             if (appCfg.frameType == FrameType::CustomFromFile) {
                 auto frameOpt = slot.getCustomFrameSprite();
                 if (frameOpt.has_value()) {
