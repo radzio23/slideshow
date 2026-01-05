@@ -130,8 +130,8 @@ void App::update() {
             newSlot->loadImage(m_imagePaths[m_currentImageIndex], appCfg.frameType);
             m_slots.push_back(std::move(newSlot));
 
-            // Maksymalnie 11 zdjęć na ekranie
-            if (m_slots.size() > 11) m_slots.erase(m_slots.begin());
+            // Maksymalnie tyle zdjęć na ekranie ile w folderze ze zdjęciami
+            if (m_slots.size() > m_imagePaths.size()) m_slots.erase(m_slots.begin());
             m_currentImageIndex = (m_currentImageIndex + 1) % m_imagePaths.size();
         }
         else {
