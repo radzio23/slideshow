@@ -1,5 +1,5 @@
-#include "App.h"
-#include "ImageLoader.h"
+#include "../include/App.h"
+#include "../include/ImageLoader.h"
 #include <ctime>
 #include <iostream>
 #include <random>
@@ -10,7 +10,7 @@ App::App() : m_config("config.txt"), m_window(sf::VideoMode::getDesktopMode(), "
     m_window.setFramerateLimit(60);
     m_window.setMouseCursorVisible(false);
 
-    m_imagePaths = ImageLoader::scanDirectory("./images/");
+    m_imagePaths = ImageLoader::scanDirectory("./assets/images/");
     setupBackground();
     setupSlots();
 }

@@ -1,4 +1,4 @@
-#include "PhotoSlot.h"
+#include "../include/PhotoSlot.h"
 #include <cmath>
 
 #define M_PI 3.14159265
@@ -34,7 +34,7 @@ void PhotoSlot::setup(const SlotConfig& cfg, FrameType fType, sf::Color fColor, 
     }
 
     // Ustawienia tekstu pod zdjêciem
-    if (m_font.openFromFile("arial.ttf")) {
+    if (m_font.openFromFile("/assets/arial.ttf")) {
         m_text.setFont(m_font);
         m_text.setString(m_config.text);
         m_text.setCharacterSize(18);

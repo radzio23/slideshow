@@ -10,7 +10,7 @@ frame_color 255 255 255
 ### Tryb losowy (true/false)
 random_mode true
 
-##### Definicje slotów na zdjęcia (slot [x] [y] [szerokość] [wysokość] [obrót])
+##### Definicje slotów na zdjęcia (slot [x] [y] [szerokość] [wysokość] [obrót] [text])
 slot 500 250 400 300 -15 23.10.2022
 slot 1200 250 350 250 0 11.04.2019
 slot 500 750 400 300 15	14.05.2005

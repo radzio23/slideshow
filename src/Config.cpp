@@ -1,4 +1,4 @@
-#include "Config.h"
+#include "../include/Config.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -34,7 +34,9 @@ Config::Config(const std::string& filename)
         if (key == "background")
         {
             // Ścieżka do pliku tła
-            ss >> m_appConfig.backgroundFile;
+            std::string temp;
+            ss >> temp;
+            m_appConfig.backgroundFile = "./assets/images/backgrounds/" + temp;
         }
         else if (key == "interval")
         {
@@ -62,7 +64,7 @@ Config::Config(const std::string& filename)
             else
             {
                 m_appConfig.frameType = FrameType::CustomFromFile;
-                m_appConfig.frameFilePath = type;
+                m_appConfig.frameFilePath = "./assets/images/frames/" + type;
             }
         }
         else if (key == "frame_color")

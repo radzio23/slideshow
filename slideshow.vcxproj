@@ -18,6 +18,22 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\App.h" />
+    <ClInclude Include="include\AppConfig.h" />
+    <ClInclude Include="include\Config.h" />
+    <ClInclude Include="include\FrameType.h" />
+    <ClInclude Include="include\ImageLoader.h" />
+    <ClInclude Include="include\PhotoSlot.h" />
+    <ClInclude Include="include\SlotConfig.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\App.cpp" />
+    <ClCompile Include="src\Config.cpp" />
+    <ClCompile Include="src\ImageLoader.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\PhotoSlot.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{CA8753FA-B374-D804-D7E2-698F575B817C}</ProjectGuid>
@@ -67,8 +83,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);C:\Users\alicj\Documents\studia\5_semestr\Interfejsy_uzytkownika_i_biblioteki_graficzne\sfml\include</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);C:\Users\alicj\Documents\studia\5_semestr\Interfejsy_uzytkownika_i_biblioteki_graficzne\sfml\build\lib\Debug;</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);P:\coding\sfml\include;</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);P:\coding\sfml\build\lib\Debug</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -95,7 +111,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>opengl32.lib;FLACd.lib;oggd.lib;vorbisd.lib;vorbisencd.lib;vorbisfiled.lib;winmm.lib;gdi32.lib;User32.lib;Advapi32.lib;freetyped.lib;sfml-main-d.lib;sfml-system-s-d.lib;sfml-window-s-d.lib;sfml-graphics-s-d.lib;sfml-audio-s-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -123,22 +139,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="App.cpp" />
-    <ClCompile Include="Config.cpp" />
-    <ClCompile Include="ImageLoader.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="PhotoSlot.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="App.h" />
-    <ClInclude Include="AppConfig.h" />
-    <ClInclude Include="Config.h" />
-    <ClInclude Include="FrameType.h" />
-    <ClInclude Include="ImageLoader.h" />
-    <ClInclude Include="PhotoSlot.h" />
-    <ClInclude Include="SlotConfig.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

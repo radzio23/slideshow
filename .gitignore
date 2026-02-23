@@ -1,6 +1,6 @@
 ﻿.vs/
 x64/
-slideshow/x64/
+slideshow/
 *.user
 *.obj
 *.pdb
